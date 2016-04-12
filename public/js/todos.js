@@ -193,31 +193,29 @@ function SetCP(){
      Number.prototype.toRadians = function() {
    return this * Math.PI / 180;
 }
-     
         // queries database
         //if iOS distance has not been filled
             //wait
-        //get iOS lat/ long
-        // get browser lat/long
-        // if radius greater than 10 feet,
-            //false
-        // else true
-        var ret;
-        var lat1 =35.149534;
-        var lon1 =-90.048980;
-        var lat2 =36.174465;
-        var lon2 =-86.767960;
-        // 50 m radius;
-        // y = R*(b2-b1)*pi/180
-        //x = R*(a2-a1)*(pi/180)*cos(b1)
-            
-            
-            // distance = distance formula
+     
+            var query= new Parse.Query(Parse.Installation);
+            var user = Parse.User.current();
+            user.fetch().then(function(fetchedUser){
+                var name = fetchedUser.getUsername();
+                var C_lat = fetchedUser.get("latitude");
+                var C_long = fetchedUser.get("longitude");
+                var M_lat = fetchedUser.get("MLat");
+                var M_long = fetchedUser.get("MLong");
+                
+                query.greaterThan('diffTime_C',0);
+
+            }, {
+                success: function() {
+            console.log("Grab was successful");
             var R = 6371000; // metres
-            var φ1 = lat1.toRadians();
-            var φ2 = lat2.toRadians();
-            var Δφ = (lat2-lat1).toRadians();
-            var Δλ = (lon2-lon1).toRadians();
+            var φ1 = C_lat.toRadians();
+            var φ2 = M_lat.toRadians();
+            var Δφ = (M_lat-C_lat).toRadians();
+            var Δλ = (M_long-C_long).toRadians();
 
             var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
             Math.cos(φ1) * Math.cos(φ2) *
@@ -232,8 +230,14 @@ function SetCP(){
             else{
                 ret = true;
             }
-            console.log(" distance is "  + d+ " "+ ret)
-        }
+            console.log(" distance is "  + d+ " "+ ret);
+    },
+    error: function(error) {
+      console.error(error);
+    }
+            })}
+     
+        
                          
                          
                          
@@ -259,12 +263,13 @@ function loginPass(verified,user){
         
         function PushTest(){
             
-            var query = new Parse.Query(Parse.Installation);
+            var query= new Parse.Query(Parse.Installation);
             var user = Parse.User.current();
             user.fetch().then(function(fetchedUser){
                 var name = fetchedUser.getUsername();
-                var lat = fetchedUser.get("latitude");
-                var long = fetchedUser.get("longitude")
+                var C_lat = fetchedUser.get("latitude");
+                var C_long = fetchedUser.get("longitude");
+                var M_
                 
                 query.greaterThan('diffTime_C',0)
                      Parse.Push.send({ 
